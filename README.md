@@ -1,7 +1,7 @@
 # Console-Based-Games
 Text Based games that can be played in Command Prompt
 
-BLACKJACK
+## BLACKJACK
 -----------------------------------------------------------------------------
 How to Play
 
@@ -10,7 +10,6 @@ A Multiplayer Black Jack game which also shows current status of table on Comman
 Steps to Play:
 1. Add Players (Just need names)
       - Every Player will be alloted $5000 and standard bet of $500.
-      
 2. Two cards are dealt to each player and dealer
 3. Each player is asked for Hit or Stand
 4. Player can split the bet if initial two cards are of same rank.
