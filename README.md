@@ -2,7 +2,6 @@
 Text Based games that can be played in Command Prompt
 
 ## BLACKJACK
------------------------------------------------------------------------------
 How to Play
 
 A Multiplayer Black Jack game which also shows current status of table on Command Prompt.
@@ -18,7 +17,6 @@ Steps to Play:
 
 
 ## TIC-TAC-TOE
------------------------------------------------------------------------------
 How to Play
 
 A Classic tictactoe game where two players compete on a grid.
