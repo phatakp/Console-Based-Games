@@ -12,7 +12,7 @@ class Card:
         self.suit = suit
         self.rank = rank
         self.points = Card.card_values.get(rank, rank)
-        self.backSide = False
+        self.backSide = False  # Will be used to hide the card
 
     @property
     def lines(self):
@@ -66,10 +66,12 @@ class Player:
         self.dealer = dealer
         self.hand = list()
         self.split_bet = False
+        self.isInGame = True
+
+        # Below values will be converted to list in case of split bet
         self.aces = 0
         self.handValue = 0
         self.bet = 0
-        self.isInGame = True
         self.result = None
 
         if self.dealer:
@@ -78,6 +80,7 @@ class Player:
             self.chips = 5000
 
     def __str__(self):
+        # The str value will be used to print the Table status
         if self.dealer:
             if len(self) == 0:
                 return f"{self.name.upper()} arrived at the table"
@@ -135,9 +138,12 @@ class Player:
 
     def assignCard(self, card, splitHand=1):
         # If player is playing split, splitHand value can be 0 or 1
+        # Both hands will be separated by ' ' between the cards
         if splitHand == 1:
+            # For second split hand, append the card at the end
             self.hand.append(card)
         else:
+            # For first split hand, insert the card at beginning
             self.hand.insert(0, card)
 
         if card.rank == 'A':  # Ace Present
@@ -161,6 +167,7 @@ class Player:
 
     def getHandValue(self, splitHand=1):
         if self.split_bet:
+            # Separate the hands by ' ' and calculate value
             aces = self.aces[splitHand]
             handDivider = self.hand.index(' ')
             if splitHand == 0:
@@ -183,6 +190,7 @@ class Player:
         return val
 
     def playSplitBet(self):
+        # For split bet, convert values into list
         self.split_bet = True
         self.chips -= 500
         self.bet = [500, 500]
@@ -193,6 +201,8 @@ class Player:
                      1 if self.hand[2].rank == 'A' else 0]
 
     def printCards(self, message=None):
+        # This will print the player hand with cards stacked in one line
+        # For split bet, two hands will be separated by a tab
         # There are seven lines in each card-print
         lines = [[] for i in range(7)]
 
@@ -223,6 +233,7 @@ class Game:
         return len([p for p in self.players if p.isInGame and not p.isDealer])
 
     def addPlayers(self):
+        # Add players until an empty input is encountered.
         while True:
             self.printTable()
             first_name = input('\n\t>>>> New Player Name:  ')
@@ -231,6 +242,7 @@ class Game:
             else:
                 break
 
+        # Exit game if no player was added
         if len(self) == 0:
             self.printTable(1)
             print('\n Cannot Continue Game without any Players')
@@ -239,6 +251,7 @@ class Game:
             exit()
 
     def printTable(self, secs=None):
+        # Prints the table stats for each player
         screen_clear(secs)
         print('\t\t', '┌' + '-' * 59 + '┐')
         print('\t\t', f"|{'TABLE STATUS':^59}|")
@@ -250,10 +263,16 @@ class Game:
             print('\t\t', '└' + '-' * 59 + '┘')
 
     def play(self):
+        # Deal two cards to each player and the dealer
         dealCards()
+
+        # Check if dealer or player got a blackJack
         if not blackJack():
+            # Get input from players whether to Hit or Stand
             getPlayerMoves()
+            # Deal cards to player if the total value < 17
             playDealer()
+            # Settle bets based on card values
             settleBets()
 
 
@@ -270,10 +289,12 @@ def dealCards():
 def blackJack():
     dealer_got_blackJack = False
     if game.dealer.handValue == 21:
+        # Dealer gets black Jack.
         game.dealer.result = 'BLACKJACK'
         dealer_got_blackJack = True
         game.dealer.hand[0].backSide = False
 
+    # Play ends and bets are settled
     for player in game.players:
         if not player.isDealer:
             if dealer_got_blackJack:
@@ -306,6 +327,8 @@ def blackJack():
 
 def getPlayerMoves():
     for player in game.players:
+        # Get Hit or Stand from each player
+        # Also check for Split or Double bets if they are eligible
         if player.isInGame and not player.isDealer:
             game.printTable(1)
             message = '\n' + game.dealer.name.upper() + ' Cards'
@@ -329,12 +352,14 @@ def playDealer():
     game.dealer.hand[0].backSide = False
     if len(game) > 0:
         while game.dealer.handValue < 17:
+            # Deal cards to dealer, when the value < 17
             game.printTable(1)
             message = '\nDealing Cards to ' + game.dealer.name.upper()
             game.dealer.printCards(message)
             game.dealer.assignCard(deck._shuffle)
 
     game.printTable(1)
+    # Check if dealer is BUSTED
     if game.dealer.handValue > 21:
         game.dealer.isInGame = False
         game.dealer.result = 'BUSTED'
@@ -346,6 +371,8 @@ def settleBets():
     for player in game.players:
         if player.isInGame and not player.isDealer:
             if not game.dealer.isInGame:
+                # Dealer is already BUSTED.
+                # Pay up each player that is still in game
                 game.printTable(1)
                 message = '\nFinal Dealer Cards'
                 game.dealer.printCards(message)
@@ -375,6 +402,7 @@ def settleBets():
 
 def betWon(player, index=None):
     if index is not None:
+        # Split bet
         game.dealer.bet -= player.bet[index]
         player.result[index] = 'WON'
         game.dealer.result = 'LOST'
@@ -399,6 +427,7 @@ def betWon(player, index=None):
 
 def betLost(player, index=None):
     if index is not None:
+        # Split bet
         player.result[index] = 'LOST'
         game.dealer.result = 'WON'
         game.dealer.bet += player.bet[index]
@@ -421,6 +450,7 @@ def betLost(player, index=None):
 
 def betStandoff(player, index=None):
     if index is not None:
+        # Split bet
         player.result[index] = 'STANDOFF for'
         game.dealer.result = 'STANDOFF'
         game.printTable(1)
@@ -441,6 +471,7 @@ def betStandoff(player, index=None):
 
 def betBusted(player, index=None):
     if index is not None:
+        # Split bet
         player.result[index] = 'LOST'
         game.dealer.result = 'WON'
         game.dealer.bet += player.bet[index]
