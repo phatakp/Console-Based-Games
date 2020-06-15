@@ -8,6 +8,7 @@ class Box:
 
     @property
     def posLines(self):
+        # Display Grid Positions 
         if self.pos == 0:
             return [(' ' * 3 + "|"), (f'{self.pos:^3}' + '|'), ('-' * 3 + '┘'), ]
         elif self.pos == 1:
@@ -29,6 +30,7 @@ class Box:
 
     @property
     def valLines(self):
+        # Display Grid values
         if self.pos == 0:
             return [(' ' * 3 + "|"), (f'{self.val:^3}' + '|'), ('-' * 3 + '┘'), ]
         elif self.pos == 1:
