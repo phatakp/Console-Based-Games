@@ -17,7 +17,7 @@ class Card:
     @property
     def lines(self):
         if self.backSide:
-            # Need to hide the card face
+            # If needed to hide the card face
             return [
                 ('┌' + '-' * 5 + '┐'),              # Line0
                 ('|' + '░' * 5 + '|'),              # Line1
